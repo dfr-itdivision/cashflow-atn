@@ -7,17 +7,129 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#121212">
 <style>
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
-  h1 { margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2); }
-  .section { background: #1f1f1f; border-radius: 15px; padding: 25px; margin: 25px auto; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-  .counter { font-size: 2.5em; margin: 20px 0; font-weight: bold; }
-  .buttons { display:flex; justify-content:space-between; gap:30px; margin-top:10px; }
-  button { flex:1; font-size:1.8em; padding:10px 0; border:none; border-radius:10px; background-color:#3a86ff; color:white; cursor:pointer; box-shadow:0 3px 10px rgba(58,134,255,0.4); transition:all .2s ease-in-out; }
-  button:hover { background-color:#2563eb; box-shadow:0 4px 14px rgba(37,99,235,0.6); transform:translateY(-2px); }
-  #total { font-size:1.8em; margin-top:25px; text-shadow:0 0 6px rgba(255,255,255,0.2); }
-  #resetBtn { margin-top:35px; background-color:#ef4444; box-shadow:0 3px 10px rgba(239,68,68,0.4); }
-  #resetBtn:hover { background-color:#dc2626; box-shadow:0 4px 14px rgba(220,38,38,0.6); }
-  .note { font-size:0.9em; color:#bdbdbd; margin-top:12px; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #121212;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+    text-shadow: 0 0 8px rgba(255,255,255,0.2);
+  }
+
+  .section {
+    background: #1f1f1f;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px auto;
+    max-width: 340px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .counter {
+    font-size: 2.5em;
+    margin: 20px 0;
+    font-weight: bold;
+  }
+
+  .buttons {
+    display:flex;
+    justify-content:space-between;
+    gap:60px;
+    margin-top:10px;
+  }
+
+  button {
+    flex:1;
+    font-size:1.8em;
+    padding:10px 0;
+    border:none;
+    border-radius:10px;
+    background-color:#3a86ff;
+    color:white;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(58,134,255,0.3);
+    transition:all .2s ease-in-out;
+  }
+
+  button:hover {
+    background-color:#2563eb;
+    box-shadow:0 3px 10px rgba(37,99,235,0.5);
+    transform:translateY(-2px);
+  }
+
+  #total {
+    font-size:1.8em;
+    margin-top:25px;
+    text-shadow:0 0 6px rgba(255,255,255,0.2);
+  }
+
+  #resetBtn {
+    margin-top:35px;
+    padding: 10px 30px;
+    background-color:#ff5151;
+    box-shadow:0 3px 8px rgba(239,68,68,0.3);
+  }
+
+  #resetBtn:hover {
+    background-color:#dc2626;
+    box-shadow:0 4px 10px rgba(220,38,38,0.5);
+  }
+
+  .note {
+    font-size:0.9em;
+    color:#bdbdbd;
+    margin-top:12px;
+  }
+
+  /* Sezione PayPal */
+  .subsection {
+    background: #292929;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.25);
+  }
+
+  .subsection h3 {
+    font-size: 1.3em;
+    margin-bottom: 10px;
+  }
+
+  .small-counter {
+    font-size: 2em;
+    margin: 10px 0;
+    font-weight: 600;
+  }
+
+  .small-buttons {
+    display:flex;
+    justify-content:space-between;
+    gap:45px;
+  }
+
+  .small-buttons button {
+    flex:1;
+    font-size:1.5em;
+    padding:8px 0;
+    border:none;
+    border-radius:10px;
+    background-color:#00b894;
+    color:white;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,184,148,0.3);
+    transition:all .2s ease-in-out;
+  }
+
+  .small-buttons button:hover {
+    background-color:#009874;
+    box-shadow:0 3px 8px rgba(0,184,148,0.5);
+    transform:translateY(-2px);
+  }
 </style>
 </head>
 <body>
@@ -29,6 +141,15 @@
   <div class="buttons">
     <button onclick="changeCount('basket', -1)">−</button>
     <button onclick="changeCount('basket', 1)">+</button>
+  </div>
+
+  <div class="subsection">
+    <h3>💳 Tramite PayPal</h3>
+    <div class="small-counter" id="paypalCount">0</div>
+    <div class="small-buttons">
+      <button onclick="changeCount('paypal', -1)">−</button>
+      <button onclick="changeCount('paypal', 1)">+</button>
+    </div>
   </div>
 </div>
 
@@ -43,21 +164,24 @@
 
 <div id="total">💰 Totale: €0</div>
 <button id="resetBtn" onclick="resetAll()">🔄 Reset</button>
-<div class="note">I dati vengono salvati nel browser. Per l'installazione come app vedi la guida fornita.</div>
 
 <script>
   let basketCount = 0;
   let barCount = 0;
-  const prezzoBasket = 5;
+  let paypalCount = 0;
+
+  const prezzoBasket = 3;
   const prezzoBibita = 2;
 
   window.addEventListener('load', () => {
-    // carica dati
     const saved = JSON.parse(localStorage.getItem('pagamentiData'));
-    if (saved) { basketCount = saved.basketCount || 0; barCount = saved.barCount || 0; }
+    if (saved) {
+      basketCount = saved.basketCount || 0;
+      barCount = saved.barCount || 0;
+      paypalCount = saved.paypalCount || 0;
+    }
     updateUI();
 
-    // registra service worker (funciona SOLO su HTTPS o localhost)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
       .then(() => console.log('Service worker registrato'))
@@ -66,25 +190,39 @@
   });
 
   function changeCount(type, value) {
-    if (type === 'basket') basketCount = Math.max(0, basketCount + value);
-    else if (type === 'bar') barCount = Math.max(0, barCount + value);
-    updateUI(); saveData();
+    if (type === 'basket') {
+      basketCount = Math.max(0, basketCount + value);
+    } else if (type === 'bar') {
+      barCount = Math.max(0, barCount + value);
+    } else if (type === 'paypal') {
+      // aggiorna anche basket automaticamente
+      paypalCount = Math.max(0, paypalCount + value);
+      basketCount = Math.max(0, basketCount + value);
+    }
+    updateUI();
+    saveData();
   }
 
   function updateUI() {
     document.getElementById('basketCount').textContent = basketCount;
     document.getElementById('barCount').textContent = barCount;
-    const totale = (basketCount * prezzoBasket) + (barCount * prezzoBibita);
+    document.getElementById('paypalCount').textContent = paypalCount;
+
+    const totale = ((basketCount) * prezzoBasket) + (barCount * prezzoBibita);
     document.getElementById('total').textContent = `💰 Totale: €${totale}`;
   }
 
   function saveData() {
-    localStorage.setItem('pagamentiData', JSON.stringify({basketCount, barCount}));
+    localStorage.setItem('pagamentiData', JSON.stringify({basketCount, barCount, paypalCount}));
   }
 
   function resetAll() {
     if (confirm('Vuoi davvero azzerare tutto?')) {
-      basketCount = 0; barCount = 0; localStorage.removeItem('pagamentiData'); updateUI();
+      basketCount = 0;
+      barCount = 0;
+      paypalCount = 0;
+      localStorage.removeItem('pagamentiData');
+      updateUI();
     }
   }
 </script>
