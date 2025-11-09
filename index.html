@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cashflow ATN</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#121212">
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
+  h1 { margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.2); }
+  .section { background: #1f1f1f; border-radius: 15px; padding: 25px; margin: 25px auto; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+  .counter { font-size: 2.5em; margin: 20px 0; font-weight: bold; }
+  .buttons { display:flex; justify-content:space-between; gap:30px; margin-top:10px; }
+  button { flex:1; font-size:1.8em; padding:10px 0; border:none; border-radius:10px; background-color:#3a86ff; color:white; cursor:pointer; box-shadow:0 3px 10px rgba(58,134,255,0.4); transition:all .2s ease-in-out; }
+  button:hover { background-color:#2563eb; box-shadow:0 4px 14px rgba(37,99,235,0.6); transform:translateY(-2px); }
+  #total { font-size:1.8em; margin-top:25px; text-shadow:0 0 6px rgba(255,255,255,0.2); }
+  #resetBtn { margin-top:35px; background-color:#ef4444; box-shadow:0 3px 10px rgba(239,68,68,0.4); }
+  #resetBtn:hover { background-color:#dc2626; box-shadow:0 4px 14px rgba(220,38,38,0.6); }
+  .note { font-size:0.9em; color:#bdbdbd; margin-top:12px; }
+</style>
+</head>
+<body>
+<h1>📋 Cashflow ATN</h1>
+
+<div class="section">
+  <h2>🏀 Basket</h2>
+  <div class="counter" id="basketCount">0</div>
+  <div class="buttons">
+    <button onclick="changeCount('basket', -1)">−</button>
+    <button onclick="changeCount('basket', 1)">+</button>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🥤 Bar</h2>
+  <div class="counter" id="barCount">0</div>
+  <div class="buttons">
+    <button onclick="changeCount('bar', -1)">−</button>
+    <button onclick="changeCount('bar', 1)">+</button>
+  </div>
+</div>
+
+<div id="total">💰 Totale: €0</div>
+<button id="resetBtn" onclick="resetAll()">🔄 Reset</button>
+<div class="note">I dati vengono salvati nel browser. Per l'installazione come app vedi la guida fornita.</div>
+
+<script>
+  let basketCount = 0;
+  let barCount = 0;
+  const prezzoBasket = 5;
+  const prezzoBibita = 2;
+
+  window.addEventListener('load', () => {
+    // carica dati
+    const saved = JSON.parse(localStorage.getItem('pagamentiData'));
+    if (saved) { basketCount = saved.basketCount || 0; barCount = saved.barCount || 0; }
+    updateUI();
+
+    // registra service worker (funciona SOLO su HTTPS o localhost)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+      .then(() => console.log('Service worker registrato'))
+      .catch(()=>console.log('Service worker non registrato (contesto non sicuro)'));
+    }
+  });
+
+  function changeCount(type, value) {
+    if (type === 'basket') basketCount = Math.max(0, basketCount + value);
+    else if (type === 'bar') barCount = Math.max(0, barCount + value);
+    updateUI(); saveData();
+  }
+
+  function updateUI() {
+    document.getElementById('basketCount').textContent = basketCount;
+    document.getElementById('barCount').textContent = barCount;
+    const totale = (basketCount * prezzoBasket) + (barCount * prezzoBibita);
+    document.getElementById('total').textContent = `💰 Totale: €${totale}`;
+  }
+
+  function saveData() {
+    localStorage.setItem('pagamentiData', JSON.stringify({basketCount, barCount}));
+  }
+
+  function resetAll() {
+    if (confirm('Vuoi davvero azzerare tutto?')) {
+      basketCount = 0; barCount = 0; localStorage.removeItem('pagamentiData'); updateUI();
+    }
+  }
+</script>
+</body>
+</html>
